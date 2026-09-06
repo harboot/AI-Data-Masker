@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>AI Data Master</title>
+  <style>
+    :root{--bg:#080d13;--panel:#101923;--panel2:#0c141d;--line:#223243;--text:#e8f0f7;--muted:#8fa2b4;--cyan:#35d6c1;--blue:#4d8dff;--warn:#ffbe55;--bad:#ff6b73;--ok:#57dfa0}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -20%,#173044 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+    main{width:min(980px,calc(100% - 32px));margin:auto;padding:56px 0 48px} header{text-align:center;margin-bottom:36px}.mark{display:inline-grid;place-items:center;width:50px;height:50px;border:1px solid #318d86;border-radius:14px;background:#102a2b;color:var(--cyan);font-size:25px;box-shadow:0 0 30px #35d6c122}h1{font-size:32px;letter-spacing:-.7px;margin:14px 0 4px}header p{margin:0;color:var(--muted)}
+    .notice{display:flex;gap:12px;align-items:flex-start;margin:0 auto 24px;padding:14px 16px;border:1px solid #6a5125;background:#211b12;border-radius:12px;color:#f6d699}.notice b{display:block;color:#ffe6ad}.notice span:first-child{font-size:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 15px 45px #0005}.card h2{margin:0;font-size:20px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}.sub{color:var(--muted);font-size:13px;margin:5px 0 20px}
+    label{display:block;font-size:12px;font-weight:700;margin:15px 0 7px;color:#bfd0de}.picker{position:relative;display:flex;align-items:center;gap:12px;min-height:66px;padding:12px;border:1px dashed #365069;border-radius:11px;background:#0a121a;cursor:pointer;transition:.2s}.picker:hover{border-color:var(--cyan);background:#0c191f}.picker input{position:absolute;inset:0;opacity:0;cursor:pointer}.file-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:9px;background:#17283a;color:#72a8ff;font-weight:800}.file-info{min-width:0}.file-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}.file-size{font-size:12px;color:var(--muted)}
+    textarea{display:block;width:100%;height:76px;resize:vertical;background:#091119;color:var(--text);border:1px solid #2b3e50;border-radius:9px;padding:10px 12px;font:13px/1.45 ui-monospace,SFMono-Regular,monospace;outline:none}textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35d6c119}.hint{font-size:11px;color:var(--muted);margin-top:5px}
+    button,.download{width:100%;border:0;border-radius:10px;padding:11px 15px;font-weight:750;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:.2s}button.primary{margin-top:18px;color:#041410;background:linear-gradient(100deg,var(--cyan),#67e9ac)}button.primary:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}button:disabled{opacity:.38;cursor:not-allowed}.downloads{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.download{display:none;color:#c9dbeb;background:#172432;border:1px solid #2d4357}.download:hover{border-color:#5681a5}.downloads.single{grid-template-columns:1fr}
+    .progress-wrap{display:none;margin-top:17px}.progress-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}.track{height:6px;background:#1b2834;border-radius:9px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .12s}.status{min-height:22px;margin-top:13px;font-size:13px;color:var(--muted)}.status.ok{color:var(--ok)}.status.error{color:var(--bad)}footer{text-align:center;color:#657787;font-size:12px;margin-top:28px}.privacy{color:var(--cyan)}
+    @media(max-width:760px){main{padding-top:30px}.grid{grid-template-columns:1fr}.card{padding:19px}.downloads{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <header><div class="mark" aria-hidden="true">⌾</div><h1>AI Data Master</h1><p>Local data masking for safer AI workflows</p></header>
+  <div class="notice"><span aria-hidden="true">⚠</span><div><b>Protect the JSON key</b>It contains every original sensitive value. Never upload or share the key with an AI service.</div></div>
+  <div class="grid">
+    <section class="card" aria-labelledby="mask-title">
+      <div class="eyebrow">Step 01</div><h2 id="mask-title">Mask a file</h2><p class="sub">Sensitive values are replaced entirely in your browser.</p>
+      <label for="sourceFile">Readable text file</label>
+      <div class="picker"><input id="sourceFile" type="file"><div class="file-icon">TXT</div><div class="file-info"><div class="file-name" id="sourceName">Choose any file type</div><div class="file-size" id="sourceSize">Text content will be verified locally</div></div></div>
+      <label for="customValues">Custom values <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+      <textarea id="customValues" placeholder="Value one, value two&#10;Another private value" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Separate values with commas or new lines. Longer matches take priority.</div>
+      <button class="primary" id="maskButton" disabled>Mask File</button>
+      <div class="progress-wrap" id="maskProgress"><div class="progress-head"><span id="maskPhase">Processing locally</span><span id="maskPercent">0%</span></div><div class="track"><div class="bar" id="maskBar"></div></div></div>
+      <div class="status" id="maskStatus" role="status" aria-live="polite">Select a file to begin.</div>
+      <div class="downloads"><a class="download" id="maskedDownload">Download Masked File</a><a class="download" id="keyDownload">Download JSON Key</a></div>
+    </section>
+    <section class="card" aria-labelledby="decode-title">
+      <div class="eyebrow">Step 02</div><h2 id="decode-title">Decode a response</h2><p class="sub">Restore values using the matching key—also fully offline.</p>
+      <label for="responseFile">AI response file</label>
+      <div class="picker"><input id="responseFile" type="file"><div class="file-icon">AI</div><div class="file-info"><div class="file-name" id="responseName">Choose response file</div><div class="file-size" id="responseSize">Any readable text extension</div></div></div>
+      <label for="keyFile">JSON key</label>
+      <div class="picker"><input id="keyFile" type="file" accept=".json,application/json"><div class="file-icon">{ }</div><div class="file-info"><div class="file-name" id="keyName">Choose JSON key</div><div class="file-size" id="keySize">Generated during masking</div></div></div>
+      <button class="primary" id="decodeButton" disabled>Decode Response</button>
+      <div class="progress-wrap" id="decodeProgress"><div class="progress-head"><span>Decoding locally</span><span id="decodePercent">0%</span></div><div class="track"><div class="bar" id="decodeBar"></div></div></div>
+      <div class="status" id="decodeStatus" role="status" aria-live="polite">Select a response and its JSON key.</div>
+      <div class="downloads single"><a class="download" id="decodedDownload">Download Decoded File</a></div>
+    </section>
+  </div>
+  <footer><span class="privacy">● Offline by design</span> · Files never leave this device</footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const CHUNK_SIZE = 4 * 1024 * 1024;
+  const $ = id => document.getElementById(id);
+  const state = { urls: [] };
+  const formatSize = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
+  const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+  const setFile = (input, nameId, sizeId) => {
+    const file = input.files[0];
+    if (file) { $(nameId).textContent = file.name; $(sizeId).textContent = formatSize(file.size); }
+  };
+  const setProgress = (prefix, value) => {
+    const percent = Math.max(0, Math.min(100, Math.round(value)));
+    $(`${prefix}Progress`).style.display = 'block'; $(`${prefix}Bar`).style.width = `${percent}%`; $(`${prefix}Percent`).textContent = `${percent}%`;
+  };
+  const setStatus = (id, message, kind = '') => { const el = $(id); el.textContent = message; el.className = `status ${kind}`; };
+  const download = (id, blob, name) => {
+    const url = URL.createObjectURL(blob); state.urls.push(url); const link = $(id); link.href = url; link.download = name; link.style.display = 'block';
+  };
+  const outputName = (name, infix) => { const dot = name.lastIndexOf('.'); return dot > 0 ? `${name.slice(0,dot)}.${infix}${name.slice(dot)}` : `${name}.${infix}.txt`; };
+  const likelyBinary = bytes => {
+    if (!bytes.length) return false;
+    let suspicious = 0;
+    for (const b of bytes) { if (b === 0) return true; if ((b < 7 || (b > 13 && b < 32)) && b !== 27) suspicious++; }
+    return suspicious / bytes.length > 0.02;
+  };
+  async function readTextChunks(file, onText, onProgress) {
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    let offset = 0;
+    while (offset < file.size) {
+      const bytes = new Uint8Array(await file.slice(offset, Math.min(offset + CHUNK_SIZE, file.size)).arrayBuffer());
+      if (offset === 0 && likelyBinary(bytes.subarray(0, Math.min(bytes.length, 65536)))) throw new Error('This file appears to be binary. Please choose a readable text file.');
+      let text;
+      try { text = decoder.decode(bytes, { stream: offset + bytes.length < file.size }); } catch (_) { throw new Error('This file is not valid UTF-8 readable text.'); }
+      await onText(text, offset + bytes.length >= file.size);
+      offset += bytes.length; onProgress(file.size ? offset / file.size * 100 : 100); await tick();
+    }
+    if (!file.size) { await onText('', true); onProgress(100); }
+  }
+  function validIPv4(value) { const parts = value.split('.'); return parts.length === 4 && parts.every(p => /^\d{1,3}$/.test(p) && +p <= 255); }
+  function validIPv6(value) {
+    const v = value.replace(/^\[|\]$/g, '').replace(/%.+$/, '');
+    if (!v.includes(':') || !/^[0-9a-f:.]+$/i.test(v)) return false;
+    let s = v, ipv4Groups = 0;
+    const tail = s.split(':').pop();
+    if (tail.includes('.')) { if (!validIPv4(tail)) return false; s = s.slice(0, -tail.length) + '0:0'; ipv4Groups = 0; }
+    if ((s.match(/::/g) || []).length > 1) return false;
+    const groups = s.split(':').filter(Boolean);
+    if (groups.some(g => !/^[0-9a-f]{1,4}$/i.test(g))) return false;
+    return s.includes('::') ? groups.length < 8 - ipv4Groups : groups.length === 8 - ipv4Groups;
+  }
+  function createMasker(customInput) {
+    const custom = [...new Set(customInput.split(/[\n,]+/).map(v => v.trim()).filter(Boolean))].sort((a,b) => b.length-a.length);
+    const definitions = [
+      { type:'CUSTOM', re: custom.length ? new RegExp(custom.map(escapeRegex).join('|'), 'g') : null, valid:()=>true, priority:0 },
+      { type:'EMAIL', re:/\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\b/gi, valid:()=>true, priority:1 },
+      { type:'IP', re:/(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])|(?<![\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\w:])/gi, valid:v=>v.includes(':')?validIPv6(v):validIPv4(v), priority:2 },
+      { type:'DOMAIN', re:/(?<![@\w-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com\.ph|com|org|net)\b/gi, valid:()=>true, priority:3 },
+      { type:'PHONE', re:/(?<!\d)(?:(?:\+62|0062|62)[ .-]?8|08)\d(?:[ .-]?\d){7,11}(?!\d)/g, valid:v=>{const n=v.replace(/\D/g,''); return n.length>=10&&n.length<=15;}, priority:4 },
+      { type:'CARD', re:/(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)/g, valid:v=>{const n=v.replace(/\D/g,''); if(n.length<13||n.length>19)return false; let sum=0,alt=false; for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 }
+    ];
+    const maps = new Map(), mappings = [], counts = {};
+    function mask(text) {
+      const hits = [];
+      for (const d of definitions) { if (!d.re) continue; d.re.lastIndex=0; let m; while ((m=d.re.exec(text))) { if(d.valid(m[0])) hits.push({start:m.index,end:m.index+m[0].length,value:m[0],...d}); if(!m[0].length)d.re.lastIndex++; } }
+      hits.sort((a,b)=>a.start-b.start||a.priority-b.priority||(b.end-b.start)-(a.end-a.start));
+      const accepted=[]; let end=-1;
+      for(const h of hits) if(h.start>=end){accepted.push(h);end=h.end;}
+      let out='', pos=0;
+      for(const h of accepted){let byValue=maps.get(h.type);if(!byValue){byValue=new Map();maps.set(h.type,byValue);}let token=byValue.get(h.value);if(!token){const number=byValue.size+1;token=`[${h.type}_${String(number).padStart(3,'0')}]`;byValue.set(h.value,token);mappings.push({token,original:h.value,type:h.type});}counts[h.type]=(counts[h.type]||0)+1;out+=text.slice(pos,h.start)+token;pos=h.end;} return out+text.slice(pos);
+    }
+    return { mask, mappings, counts };
+  }
+  $('sourceFile').addEventListener('change', e => { setFile(e.target,'sourceName','sourceSize'); $('maskButton').disabled=!e.target.files[0]; setStatus('maskStatus',e.target.files[0]?'Ready to mask locally.':'Select a file to begin.'); });
+  $('responseFile').addEventListener('change', e => {setFile(e.target,'responseName','responseSize');updateDecode();});
+  $('keyFile').addEventListener('change', e => {setFile(e.target,'keyName','keySize');updateDecode();});
+  function updateDecode(){const ready=$('responseFile').files[0]&&$('keyFile').files[0];$('decodeButton').disabled=!ready;setStatus('decodeStatus',ready?'Ready to decode locally.':'Select a response and its JSON key.');}
+  $('maskButton').addEventListener('click', async () => {
+    const file=$('sourceFile').files[0]; if(!file)return; $('maskButton').disabled=true; $('maskedDownload').style.display=$('keyDownload').style.display='none'; setStatus('maskStatus','Reading and masking…');setProgress('mask',0);
+    try{
+      const masker=createMasker($('customValues').value), parts=[]; let carry='';
+      await readTextChunks(file,async(text,last)=>{carry+=text;let cut=last?carry.length:carry.lastIndexOf('\n')+1;if(cut>0){parts.push(masker.mask(carry.slice(0,cut)));carry=carry.slice(cut);}},p=>setProgress('mask',p));
+      const total=Object.values(masker.counts).reduce((a,b)=>a+b,0), categories=Object.keys(masker.counts).length;
+      const key={version:'1.0',createdAt:new Date().toISOString(),mappings:masker.mappings};
+      download('maskedDownload',new Blob(parts,{type:'text/plain;charset=utf-8'}),outputName(file.name,'masked'));
+      download('keyDownload',new Blob([JSON.stringify(key,null,2)],{type:'application/json'}),outputName(file.name,'key').replace(/\.[^.]+$/,'.json'));
+      setStatus('maskStatus',`Masked ${total.toLocaleString('en-US')} occurrences across ${categories} ${categories===1?'category':'categories'}.`,'ok');
+    }catch(err){setStatus('maskStatus',err.message||'Unable to mask this file.','error');}finally{$('maskButton').disabled=false;}
+  });
+  $('decodeButton').addEventListener('click',async()=>{
+    const response=$('responseFile').files[0],keyFile=$('keyFile').files[0];if(!response||!keyFile)return;$('decodeButton').disabled=true;$('decodedDownload').style.display='none';setStatus('decodeStatus','Reading key and decoding…');setProgress('decode',0);
+    try{
+      let key;try{key=JSON.parse(await keyFile.text());}catch(_){throw new Error('The selected key is not valid JSON.');}
+      if(!key||!Array.isArray(key.mappings)||key.mappings.some(m=>!m||typeof m.token!=='string'||typeof m.original!=='string'))throw new Error('The JSON file is not a valid AI Data Master key.');
+      const lookup=new Map(key.mappings.map(m=>[m.token,m.original]));const tokens=[...lookup.keys()].sort((a,b)=>b.length-a.length);const re=tokens.length?new RegExp(tokens.map(escapeRegex).join('|'),'g'):null;const parts=[];let carry='';
+      await readTextChunks(response,async(text,last)=>{carry+=text;let cut=last?carry.length:carry.lastIndexOf('\n')+1;if(cut>0){const piece=carry.slice(0,cut);parts.push(re?piece.replace(re,t=>lookup.get(t)):piece);carry=carry.slice(cut);}},p=>setProgress('decode',p));
+      download('decodedDownload',new Blob(parts,{type:'text/plain;charset=utf-8'}),outputName(response.name,'decoded'));setStatus('decodeStatus','Response decoded successfully.','ok');
+    }catch(err){setStatus('decodeStatus',err.message||'Unable to decode this file.','error');}finally{$('decodeButton').disabled=false;}
+  });
+  window.addEventListener('beforeunload',()=>state.urls.forEach(URL.revokeObjectURL));
+})();
+</script>
+</body>
+</html>
