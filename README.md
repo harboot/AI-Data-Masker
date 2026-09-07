@@ -29,9 +29,10 @@ manager, framework, CDN, analytics, or network dependency.
    lines; only the first-row header is required, not the column's values.
 3. Optionally enter custom values, separated by commas or new lines.
 4. Select **Mask File**.
-5. Review the beginning of the masked result in the local preview. The preview
-   never displays the raw source data. CSV, TSV, and arrays of JSON objects are
-   shown as tables; other readable files are shown as text.
+5. Review the beginning of the masked result in the full-width local preview
+   below both workflow cards. The preview never displays the raw source data.
+   CSV, TSV, and arrays of JSON objects are shown as tables; other readable
+   files are shown as text.
 6. When processing finishes, download both:
    - **Masked File** — the copy intended for the AI service.
    - **JSON Key** — the private data needed to restore masked values.
