@@ -24,13 +24,15 @@ manager, framework, CDN, analytics, or network dependency.
 
 1. In **Mask a file**, select a readable UTF-8 text file. The file picker does
    not restrict extensions.
-2. Review the beginning of the file in the local preview. CSV, TSV, and arrays
-   of JSON objects are shown as tables; other readable files are shown as text.
-3. For CSV or TSV data, optionally enter one or more exact column header names
+2. For CSV or TSV data, optionally enter one or more exact column header names
    to replace every value in those columns. Separate headers with commas or new
    lines; only the first-row header is required, not the column's values.
-4. Optionally enter custom values, separated by commas or new lines.
-5. Select **Mask File**.
+3. Optionally enter custom values, separated by commas or new lines.
+4. Select **Mask File**.
+5. Review the beginning of the masked result in the full-width local preview
+   below both workflow cards. The preview never displays the raw source data.
+   CSV, TSV, and arrays of JSON objects are shown as tables; other readable
+   files are shown as text.
 6. When processing finishes, download both:
    - **Masked File** — the copy intended for the AI service.
    - **JSON Key** — the private data needed to restore masked values.
