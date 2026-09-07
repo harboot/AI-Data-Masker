@@ -24,12 +24,17 @@ manager, framework, CDN, analytics, or network dependency.
 
 1. In **Mask a file**, select a readable UTF-8 text file. The file picker does
    not restrict extensions.
-2. Optionally enter custom values, separated by commas or new lines.
-3. Select **Mask File**.
-4. When processing finishes, download both:
+2. Review the beginning of the file in the local preview. CSV, TSV, and arrays
+   of JSON objects are shown as tables; other readable files are shown as text.
+3. For CSV or TSV data, optionally enter one or more exact column header names
+   to replace every value in those columns. Separate headers with commas or new
+   lines; only the first-row header is required, not the column's values.
+4. Optionally enter custom values, separated by commas or new lines.
+5. Select **Mask File**.
+6. When processing finishes, download both:
    - **Masked File** — the copy intended for the AI service.
    - **JSON Key** — the private data needed to restore masked values.
-5. Keep the JSON key private and separate from the masked file.
+7. Keep the JSON key private and separate from the masked file.
 
 The masked filename retains the original extension where possible:
 
@@ -59,8 +64,14 @@ AI Data Master masks the following categories:
 - Email addresses.
 - Domains ending in `.com`, `.com.ph`, `.org`, or `.net`.
 - Indonesian phone numbers beginning with supported `08` or `62` forms.
+- Philippine mobile numbers beginning with `09` or the `63` country code,
+  including `+63` and `0063` international forms.
 - Credit card numbers only when the digits pass Luhn validation.
 - User-provided custom values.
+- Every value under user-selected CSV or TSV column headers.
+
+The interface keeps this complete list collapsed by default so it remains
+available without crowding the masking form.
 
 It deliberately does **not** detect or mask:
 
@@ -79,6 +90,7 @@ category receives the same stable placeholder, for example:
 [DOMAIN_001]
 [EMAIL_001]
 [PHONE_001]
+[PHONE_PH_001]
 [CARD_001]
 [CUSTOM_001]
 ```
