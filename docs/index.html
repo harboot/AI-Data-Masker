@@ -50,6 +50,7 @@
     <div class="dialog-heading"><div><div class="eyebrow">Custom regex</div><h2 id="detectorDialogTitle">Add detector</h2></div><button class="icon-button" id="closeDetectorDialog" type="button" aria-label="Close">×</button></div>
     <input id="detectorId" type="hidden">
     <label for="detectorName">Name</label><input id="detectorName" required maxlength="40" placeholder="Employee ID">
+    <label for="detectorDescription">Description</label><textarea id="detectorDescription" required maxlength="240" placeholder="Masks internal employee identifiers."></textarea>
     <label for="detectorPattern">Regex</label><textarea id="detectorPattern" required spellcheck="false" placeholder="EMP-\d{6}"></textarea>
     <div class="hint">Enter only the regex pattern.</div>
     <label for="detectorPrefix">Prefix</label><input id="detectorPrefix" required maxlength="30" pattern="[A-Za-z][A-Za-z0-9_]*" placeholder="EMPLOYEE_ID">
@@ -61,6 +62,7 @@
 <dialog id="regexDetailsDialog" aria-labelledby="regexDetailsTitle">
   <form method="dialog">
     <div class="dialog-heading"><div><div class="eyebrow">Detector details</div><h2 id="regexDetailsTitle"></h2></div><button class="icon-button" type="submit" aria-label="Close">×</button></div>
+    <label for="regexDetailsDescription">Description</label><textarea id="regexDetailsDescription" readonly></textarea>
     <label for="regexDetailsPrefix">Prefix</label><input id="regexDetailsPrefix" readonly>
     <div class="hint">Matched values use this prefix in placeholders, followed by a sequence number.</div>
     <label for="regexDetailsPattern">Regex pattern</label><textarea id="regexDetailsPattern" readonly spellcheck="false"></textarea>

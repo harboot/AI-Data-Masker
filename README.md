@@ -21,9 +21,10 @@ copy: selected files never leave your browser.
 ## Quick start
 
 1. Download or clone this repository.
-2. Open `docs/index.html` directly in a modern browser, or use the live preview
-   linked above.
-3. No installation, build command, or local web server is required.
+2. Serve the repository with a local static server (for example, `python3 -m
+   http.server`) or use the live preview linked above.
+3. Open `docs/index.html` through that server. No installation or build command is
+   required.
 
 ## Mask a file
 
@@ -87,9 +88,10 @@ AI Data Masker masks the following categories:
 ### Detection settings
 
 Open **Detection settings** above the masking workflow to enable or disable each
-built-in detector. Drag detector rows to change their matching priority. Built-in
-definitions are read-only because some of them also perform validation that
-cannot be represented by a regular expression alone.
+built-in detector. Drag detector rows to change their matching priority. The four built-in detectors—email, IP address, domain, and credit card—are
+read-only and can only be enabled or disabled. Other bundled definitions are
+loaded from `docs/predefine.json`; they can be edited or deleted like custom
+detectors.
 
 Detection runs sequentially in the displayed order when matches overlap. Phone
 and Luhn-valid card detectors are positioned ahead of the Philippine identifier
@@ -99,7 +101,8 @@ customized by dragging detector rows.
 
 Use the eye icon beside any detector to view its regex and test it against a sample
 value without changing settings. You can also add custom regex detectors, edit their
-name, regex, and placeholder prefix, enable or disable them, and delete them. **Custom values** and **Columns to mask** are included in
+name, description, regex, and placeholder prefix, enable or disable them, and
+delete them. Detector details also display the description. **Custom values** and **Columns to mask** are included in
 the panel. All settings are stored only in the browser's local storage and can
 be exported to JSON or imported into another browser.
 

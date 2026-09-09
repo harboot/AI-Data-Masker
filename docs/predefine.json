@@ -1,0 +1,10 @@
+[
+  {"id":"phone","name":"Indonesian phone","description":"Indonesian mobile numbers using the 08 or 62 country-code formats.","prefix":"PHONE","pattern":"(?<!\\d)(?:(?:\\+62|0062|62)[ .-]?8|08)\\d(?:[ .-]?\\d){7,11}(?!\\d)"},
+  {"id":"phone-ph","name":"Philippine Phone","description":"Philippine mobile numbers using 09, +63, 63, or 0063 formats.","prefix":"PHONE_PH","pattern":"(?<!\\d)(?:(?:\\+63|0063|63)[ .-]?9|09)\\d(?:[ .-]?\\d){8}(?!\\d)"},
+  {"id":"nik","name":"Indonesian NIK/KTP number","description":"Sixteen-digit Indonesian identity numbers with a valid encoded birth day and month.","prefix":"NIK","pattern":"(?<!\\d)\\d{16}(?!\\d)","validator":"nik"},
+  {"id":"tin-ph","name":"Philippine TIN","description":"Philippine tax identification numbers in 9-digit or grouped 12-digit form.","prefix":"TIN_PH","pattern":"(?<!\\d)(?:\\d{3}-\\d{3}-\\d{3}(?:-\\d{3})?|\\d{9})(?!\\d)"},
+  {"id":"sss-ph","name":"Philippine SSS number","description":"Philippine Social Security System numbers in plain or grouped form.","prefix":"SSS_PH","pattern":"(?<!\\d)(?:\\d{2}-\\d{7}-\\d|\\d{10})(?!\\d)"},
+  {"id":"philhealth","name":"PhilHealth number","description":"PhilHealth identification numbers in the standard grouped format.","prefix":"PHILHEALTH","pattern":"(?<!\\d)\\d{2}-\\d{9}-\\d(?!\\d)"},
+  {"id":"pagibig","name":"Pag-IBIG MID number","description":"Pag-IBIG membership identification numbers in grouped format.","prefix":"PAGIBIG","pattern":"(?<!\\d)\\d{4}-\\d{4}-\\d{4}(?!\\d)"},
+  {"id":"long-number","name":"Long number (first 10 digits)","description":"Masks the first ten digits of any otherwise unmatched run of ten or more digits.","prefix":"LONG_NUMBER","pattern":"(?<!\\d)\\d{10}(?=\\d*)"}
+]
