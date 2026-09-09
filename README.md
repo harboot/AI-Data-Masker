@@ -75,8 +75,10 @@ AI Data Masker masks the following categories:
   including `+63` and `0063` international forms.
 - Indonesian NIK/KTP numbers with a valid encoded day and month.
 - Credit card numbers only when the digits pass Luhn validation.
+- Philippine TINs in 9-digit form or the usual grouped 12-digit form.
 - Philippine SSS numbers in 10-digit or `XX-XXXXXXX-X` form.
 - PhilHealth numbers in plain 12-digit or `XX-XXXXXXXXX-X` form.
+- Pag-IBIG MID numbers in `XXXX-XXXX-XXXX` form.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
 
@@ -86,9 +88,9 @@ Open **Detection settings** above the masking workflow to enable or disable each
 built-in detector. Drag detector rows to change their matching priority. Only
 the IP-address and Luhn-valid credit-card detectors live in source code; they
 are read-only and can only be enabled or disabled. Email, domain, KTP,
-Indonesian phone, PhilHealth, SSS, and Philippine phone definitions are pure
-regex entries loaded from `docs/predefine.json`, and can be edited or deleted
-like custom detectors.
+Indonesian phone, PhilHealth, SSS, Pag-IBIG, Philippine TIN, and Philippine
+phone definitions are pure regex entries loaded from `docs/predefine.json`, and
+can be edited or deleted like custom detectors.
 
 Detection runs sequentially in the displayed order when matches overlap. This
 order can be customized by dragging detector rows.
@@ -121,6 +123,8 @@ category receives the same stable placeholder, for example:
 [CARD_001]
 [SSS_PH_001]
 [PHILHEALTH_001]
+[PAGIBIG_001]
+[TIN_PH_001]
 [MY_COLUMN_001]
 [CUSTOM_001]
 ```
