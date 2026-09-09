@@ -75,6 +75,12 @@ AI Data Masker masks the following categories:
   including `+63` and `0063` international forms.
 - Indonesian NIK/KTP numbers with a valid encoded day and month.
 - Credit card numbers only when the digits pass Luhn validation.
+- Philippine TINs in 9-digit form or the usual grouped 12-digit form.
+- Philippine SSS numbers in 10-digit or `XX-XXXXXXX-X` form.
+- PhilHealth numbers in `XX-XXXXXXXXX-X` form.
+- Pag-IBIG MID numbers in `XXXX-XXXX-XXXX` form.
+- Any remaining run of 10 or more digits. Only its first 10 digits are masked,
+  leaving subsequent digits unchanged.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
 
@@ -84,6 +90,12 @@ Open **Detection settings** above the masking workflow to enable or disable each
 built-in detector. Drag detector rows to change their matching priority. Built-in
 definitions are read-only because some of them also perform validation that
 cannot be represented by a regular expression alone.
+
+Detection runs sequentially in the displayed order when matches overlap. Phone
+and Luhn-valid card detectors are positioned ahead of the Philippine identifier
+detectors, while the general long-number detector is last so a more specific
+detector gets the first opportunity to mask a value. This order can still be
+customized by dragging detector rows.
 
 Use the eye icon beside any detector to view its regex and test it against a sample
 value without changing settings. You can also add custom regex detectors, edit their
@@ -107,6 +119,11 @@ category receives the same stable placeholder, for example:
 [PHONE_PH_001]
 [NIK_001]
 [CARD_001]
+[TIN_PH_001]
+[SSS_PH_001]
+[PHILHEALTH_001]
+[PAGIBIG_001]
+[LONG_NUMBER_001]
 [CUSTOM_001]
 ```
 
