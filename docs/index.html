@@ -16,7 +16,7 @@
     <div class="manager-content">
       <div class="manager-heading"><p class="sub">Choose which sensitive-value detectors to use. Drag a row to set which detector wins when matches overlap; the first row has the highest priority. Settings stay in this browser.</p><div class="setting-actions"><button class="secondary" id="addDetectorButton" type="button">+ Add detector</button><button class="secondary" id="exportSettingsButton" type="button">Export</button><button class="secondary" id="importSettingsButton" type="button">Import</button><input id="settingsFile" type="file" accept=".json,application/json" hidden></div></div>
       <div class="detector-list" id="detectorList"></div>
-      <div class="setting-fields"><div><label for="columnHeaders">Columns to mask <span>(optional)</span></label><textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">Enter exact CSV or TSV header names, separated by commas or new lines. Every non-empty value beneath those headers will be masked, even when it does not match a detector.</div></div><div><label for="customValues">Custom values <span>(optional)</span></label><textarea class="compact" id="customValues" placeholder="Value one, value two" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Enter literal words or phrases to mask, separated by commas or new lines. You do not need regex syntax; when values overlap, the longer match takes priority.</div></div></div>
+      <div class="setting-fields"><div><label for="customValues">Custom values <span>(optional)</span></label><textarea class="compact" id="customValues" placeholder="Value one, value two" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Enter literal words or phrases to mask, separated by commas or new lines. You do not need regex syntax; when values overlap, the longer match takes priority.</div></div></div>
       <div class="import-status" id="settingsStatus" role="status" aria-live="polite"></div>
     </div>
   </details>
@@ -47,15 +47,17 @@
 </main>
 <dialog id="detectorDialog" aria-labelledby="detectorDialogTitle">
   <form id="detectorForm" method="dialog">
-    <div class="dialog-heading"><div><div class="eyebrow">Custom regex</div><h2 id="detectorDialogTitle">Add detector</h2></div><button class="icon-button" id="closeDetectorDialog" type="button" aria-label="Close">×</button></div>
+    <div class="dialog-heading"><div><div class="eyebrow">Custom detector</div><h2 id="detectorDialogTitle">Add detector</h2></div><button class="icon-button" id="closeDetectorDialog" type="button" aria-label="Close">×</button></div>
     <input id="detectorId" type="hidden">
     <label for="detectorName">Name</label><input id="detectorName" required maxlength="40" placeholder="Employee ID">
     <label for="detectorDescription">Description</label><textarea id="detectorDescription" required maxlength="240" placeholder="Masks internal employee identifiers."></textarea>
-    <label for="detectorPattern">Regex</label><textarea id="detectorPattern" required spellcheck="false" placeholder="EMP-\d{6}"></textarea>
-    <div class="hint">Enter only the regex pattern.</div>
+    <label for="detectorGroup">Group</label><input id="detectorGroup" maxlength="40" placeholder="Company">
+    <label for="detectorType">Match by</label><select id="detectorType"><option value="regex">Regex pattern</option><option value="header">Column header</option></select>
+    <div id="detectorPatternFields"><label for="detectorPattern">Regex</label><textarea id="detectorPattern" spellcheck="false" placeholder="EMP-\d{6}"></textarea><div class="hint">Enter only the regex pattern.</div></div>
+    <div id="detectorHeaderFields" hidden><label for="detectorHeader">Column header</label><input id="detectorHeader" placeholder="employee_id"><div class="hint">Matches every non-empty value beneath this exact CSV or TSV header.</div></div>
     <label for="detectorPrefix">Prefix</label><input id="detectorPrefix" required maxlength="30" pattern="[A-Za-z][A-Za-z0-9_]*" placeholder="EMPLOYEE_ID">
     <div class="hint">The prefix creates placeholders such as [EMPLOYEE_ID_001]. Letters, numbers, and underscores only.</div>
-    <div class="regex-test"><label for="detectorSample">Test with sample value</label><div class="test-row"><input id="detectorSample" placeholder="EMP-123456"><button class="secondary" id="testDetectorButton" type="button">Test regex</button></div><div class="test-result" id="detectorTestResult" role="status" aria-live="polite"></div></div>
+    <div class="regex-test" id="detectorRegexTest"><label for="detectorSample">Test with sample value</label><div class="test-row"><input id="detectorSample" placeholder="EMP-123456"><button class="secondary" id="testDetectorButton" type="button">Test regex</button></div><div class="test-result" id="detectorTestResult" role="status" aria-live="polite"></div></div>
     <div class="dialog-actions"><button class="secondary" id="cancelDetectorButton" type="button">Cancel</button><button class="primary" type="submit">Save detector</button></div>
   </form>
 </dialog>
@@ -66,7 +68,7 @@
     <label for="regexDetailsPrefix">Prefix</label><input id="regexDetailsPrefix" readonly>
     <div class="hint">Matched values use this prefix in placeholders, followed by a sequence number.</div>
     <label for="regexDetailsPattern">Regex pattern</label><textarea id="regexDetailsPattern" readonly spellcheck="false"></textarea>
-    <div class="hint">This pattern is applied without case sensitivity. Some predefined detectors also validate matched values after the regex check.</div>
+    <div class="hint">Regex patterns are applied without case sensitivity. Predefined JSON detectors use regex matching only.</div>
     <div class="regex-test"><label for="regexDetailsSample">Test with sample value</label><div class="hint test-help">Enter an example to see whether this detector's regex finds a match. Testing does not change your settings.</div><div class="test-row"><input id="regexDetailsSample" placeholder="Enter a sample value"><button class="secondary" id="testRegexDetailsButton" type="button">Test regex</button></div><div class="test-result" id="regexDetailsTestResult" role="status" aria-live="polite"></div></div>
   </form>
 </dialog>
