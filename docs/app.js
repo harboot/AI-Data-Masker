@@ -9,8 +9,9 @@
     { id:'ip', name:'IPv4 & IPv6 address', prefix:'IP', pattern:'(?<![\\w.])(?:\\d{1,3}\\.){3}\\d{1,3}(?![\\w.])|(?<![\\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\\w:])', valid:value=>value.includes(':')?validIPv6(value):validIPv4(value), priority:2 },
     { id:'domain', name:'Supported domain', prefix:'DOMAIN', pattern:'(?<![@\\w-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(?:com\\.ph|com|org|net)\\b', valid:()=>true, priority:3 },
     { id:'phone', name:'Indonesian phone', prefix:'PHONE', pattern:'(?<!\\d)(?:(?:\\+62|0062|62)[ .-]?8|08)\\d(?:[ .-]?\\d){7,11}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return n.length>=10&&n.length<=15;}, priority:4 },
-    { id:'phone-ph', name:'Philippine mobile', prefix:'PHONE_PH', pattern:'(?<!\\d)(?:(?:\\+63|0063|63)[ .-]?9|09)\\d(?:[ .-]?\\d){8}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return /^09\d{9}$/.test(n)||/^639\d{9}$/.test(n)||/^00639\d{9}$/.test(n);}, priority:4 },
-    { id:'card', name:'Luhn-valid credit card', prefix:'CARD', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 }
+    { id:'phone-ph', name:'Philippine Phone', prefix:'PHONE_PH', pattern:'(?<!\\d)(?:(?:\\+63|0063|63)[ .-]?9|09)\\d(?:[ .-]?\\d){8}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return /^09\d{9}$/.test(n)||/^639\d{9}$/.test(n)||/^00639\d{9}$/.test(n);}, priority:4 },
+    { id:'nik', name:'Indonesian NIK/KTP number', prefix:'NIK', pattern:'(?<!\\d)\\d{16}(?!\\d)', valid:validNIK, priority:5 },
+    { id:'card', name:'Luhn-valid credit card', prefix:'CARD', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:6 }
   ];
   const detectorSettings = loadDetectorSettings();
   const formatSize = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
@@ -63,6 +64,7 @@
     if (!file.size) { await onText('', true); onProgress(100); }
   }
   function validIPv4(value) { const parts = value.split('.'); return parts.length === 4 && parts.every(p => /^\d{1,3}$/.test(p) && +p <= 255); }
+  function validNIK(value) { const day=+value.slice(6,8),month=+value.slice(8,10),year=+value.slice(10,12);if(!month||month>12||(!day)||(day>31&&day<41)||day>71)return false;const date=new Date(2000+year,month-1,day>40?day-40:day);return date.getMonth()===month-1&&date.getDate()===(day>40?day-40:day); }
   function validIPv6(value) {
     const v = value.replace(/^\[|\]$/g, '').replace(/%.+$/, '');
     if (!v.includes(':') || !/^[0-9a-f:.]+$/i.test(v)) return false;
@@ -77,42 +79,54 @@
   function loadDetectorSettings() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && typeof saved === 'object' && Array.isArray(saved.custom)) return { disabled:Array.isArray(saved.disabled)?saved.disabled:[], custom:saved.custom.filter(isValidCustomDetector) };
+      if (saved && typeof saved === 'object' && Array.isArray(saved.custom)) return normalizeSettings(saved);
     } catch (_) { /* Ignore unavailable storage or invalid saved settings. */ }
-    return { disabled:[], custom:[] };
+    return normalizeSettings({ disabled:[], custom:[] });
+  }
+  function normalizeSettings(settings) {
+    const custom=Array.isArray(settings.custom)?settings.custom.filter(isValidCustomDetector):[],known=[...BUILTIN_DETECTORS.map(d=>d.id),...custom.map(d=>d.id)],savedOrder=Array.isArray(settings.order)?settings.order.filter(id=>known.includes(id)):[];
+    return {disabled:Array.isArray(settings.disabled)?settings.disabled.filter(id=>BUILTIN_DETECTORS.some(d=>d.id===id)):[],custom,order:[...new Set([...savedOrder,...known])],columnHeaders:typeof settings.columnHeaders==='string'?settings.columnHeaders:'',customValues:typeof settings.customValues==='string'?settings.customValues:''};
   }
   function isValidCustomDetector(detector) {
     if (!detector || typeof detector.id !== 'string' || typeof detector.name !== 'string' || typeof detector.pattern !== 'string' || !/^[A-Za-z][A-Za-z0-9_]*$/.test(detector.prefix || '')) return false;
     try { new RegExp(detector.pattern, 'gi'); return true; } catch (_) { return false; }
   }
   function saveDetectorSettings() {
+    detectorSettings.columnHeaders=$('columnHeaders').value;detectorSettings.customValues=$('customValues').value;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(detectorSettings)); } catch (_) { /* The manager still works for this tab. */ }
   }
+  function orderedDetectors() { const all=[...BUILTIN_DETECTORS.map(d=>({...d,builtin:true,enabled:!detectorSettings.disabled.includes(d.id)})),...detectorSettings.custom.map(d=>({...d,builtin:false}))];return all.sort((a,b)=>detectorSettings.order.indexOf(a.id)-detectorSettings.order.indexOf(b.id)); }
   function renderDetectors() {
     const list=$('detectorList');list.replaceChildren();
-    const detectors=[...BUILTIN_DETECTORS.map(d=>({...d,builtin:true,enabled:!detectorSettings.disabled.includes(d.id)})),...detectorSettings.custom.map(d=>({...d,builtin:false}))];
+    const detectors=orderedDetectors();
     detectors.forEach(detector=>{
-      const row=document.createElement('div');row.className='detector-row';
+      const row=document.createElement('div');row.className='detector-row';row.draggable=true;row.dataset.id=detector.id;const handle=document.createElement('span');handle.className='drag-handle';handle.textContent='⠿';handle.title='Drag to reorder';row.append(handle);
       const toggle=document.createElement('label');toggle.className='detector-toggle';toggle.title=`${detector.enabled?'Disable':'Enable'} ${detector.name}`;
       const input=document.createElement('input');input.type='checkbox';input.checked=detector.enabled;input.setAttribute('aria-label',`Enable ${detector.name}`);const track=document.createElement('span');track.className='toggle-track';toggle.append(input,track);
       input.addEventListener('change',()=>{if(detector.builtin){detectorSettings.disabled=input.checked?detectorSettings.disabled.filter(id=>id!==detector.id):[...new Set([...detectorSettings.disabled,detector.id])];}else{const saved=detectorSettings.custom.find(d=>d.id===detector.id);if(saved)saved.enabled=input.checked;}saveDetectorSettings();renderDetectors();});
       const info=document.createElement('div');info.className='detector-info';const title=document.createElement('div');title.className='detector-name';title.textContent=detector.name;const kind=document.createElement('span');kind.className='detector-kind';kind.textContent=detector.builtin?'Predefined':`Custom · ${detector.prefix}`;title.append(kind);const regex=document.createElement('div');regex.className='detector-regex';regex.textContent=detector.pattern;regex.title=detector.pattern;info.append(title,regex);row.append(toggle,info);
-      if(!detector.builtin){const actions=document.createElement('div');actions.className='detector-actions';const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Edit';edit.addEventListener('click',()=>openDetectorDialog(detector));const remove=document.createElement('button');remove.type='button';remove.className='secondary danger';remove.textContent='Delete';remove.addEventListener('click',()=>{if(confirm(`Delete custom detector “${detector.name}”?`)){detectorSettings.custom=detectorSettings.custom.filter(d=>d.id!==detector.id);saveDetectorSettings();renderDetectors();}});actions.append(edit,remove);row.append(actions);}list.append(row);
+      if(!detector.builtin){const actions=document.createElement('div');actions.className='detector-actions';const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Edit';edit.addEventListener('click',()=>openDetectorDialog(detector));const remove=document.createElement('button');remove.type='button';remove.className='secondary danger';remove.textContent='Delete';remove.addEventListener('click',()=>{if(confirm(`Delete custom detector “${detector.name}”?`)){detectorSettings.custom=detectorSettings.custom.filter(d=>d.id!==detector.id);detectorSettings.order=detectorSettings.order.filter(id=>id!==detector.id);saveDetectorSettings();renderDetectors();}});actions.append(edit,remove);row.append(actions);}list.append(row);
     });
   }
+  let draggedDetectorId='';
+  $('detectorList').addEventListener('dragstart',event=>{const row=event.target.closest('.detector-row');if(!row)return;draggedDetectorId=row.dataset.id;row.classList.add('dragging');event.dataTransfer.effectAllowed='move';});
+  $('detectorList').addEventListener('dragend',event=>{event.target.closest('.detector-row')?.classList.remove('dragging');detectorSettings.order=[...$('detectorList').querySelectorAll('.detector-row')].map(row=>row.dataset.id);saveDetectorSettings();draggedDetectorId='';});
+  $('detectorList').addEventListener('dragover',event=>{event.preventDefault();const target=event.target.closest('.detector-row'),dragged=$('detectorList').querySelector(`[data-id="${draggedDetectorId}"]`);if(!target||!dragged||target===dragged)return;const after=event.clientY>target.getBoundingClientRect().top+target.offsetHeight/2;$('detectorList').insertBefore(dragged,after?target.nextSibling:target);});
   function openDetectorDialog(detector=null){$('detectorDialogTitle').textContent=detector?'Edit detector':'Add detector';$('detectorId').value=detector?.id||'';$('detectorName').value=detector?.name||'';$('detectorPattern').value=detector?.pattern||'';$('detectorPrefix').value=detector?.prefix||'';$('detectorSample').value='';setTestResult('','');$('detectorDialog').showModal();}
   function closeDetectorDialog(){$('detectorDialog').close();}
   function setTestResult(message,kind){const result=$('detectorTestResult');result.textContent=message;result.className=`test-result ${kind}`;}
   function testDetector(){try{const re=new RegExp($('detectorPattern').value,'gi'),sample=$('detectorSample').value,matches=sample.match(re);setTestResult(matches?.length?`Matched ${matches.length} value${matches.length===1?'':'s'}: ${matches.join(', ')}`:'No match found.',matches?.length?'ok':'error');}catch(err){setTestResult(`Invalid regex: ${err.message}`,'error');}}
   $('addDetectorButton').addEventListener('click',()=>openDetectorDialog());$('closeDetectorDialog').addEventListener('click',closeDetectorDialog);$('cancelDetectorButton').addEventListener('click',closeDetectorDialog);$('testDetectorButton').addEventListener('click',testDetector);
-  $('detectorForm').addEventListener('submit',event=>{event.preventDefault();const id=$('detectorId').value,name=$('detectorName').value.trim(),pattern=$('detectorPattern').value,prefix=$('detectorPrefix').value.trim().toUpperCase();try{new RegExp(pattern,'gi');}catch(err){setTestResult(`Invalid regex: ${err.message}`,'error');return;}const duplicate=BUILTIN_DETECTORS.some(d=>d.prefix===prefix)||detectorSettings.custom.some(d=>d.prefix===prefix&&d.id!==id);if(duplicate){setTestResult('Prefix must be unique.','error');return;}if(id){const detector=detectorSettings.custom.find(d=>d.id===id);Object.assign(detector,{name,pattern,prefix});}else{detectorSettings.custom.push({id:`custom-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,pattern,prefix,enabled:true});}saveDetectorSettings();renderDetectors();closeDetectorDialog();});
+  $('exportSettingsButton').addEventListener('click',()=>{saveDetectorSettings();const url=URL.createObjectURL(new Blob([JSON.stringify({version:1,...detectorSettings},null,2)],{type:'application/json'})),link=document.createElement('a');state.urls.push(url);link.href=url;link.download='ai-data-master-settings.json';link.click();$('settingsStatus').textContent='Settings exported.';});
+  $('importSettingsFile').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());if(!parsed||!Array.isArray(parsed.custom))throw new Error('Invalid settings file.');const imported=normalizeSettings(parsed);Object.assign(detectorSettings,imported);$('columnHeaders').value=imported.columnHeaders;$('customValues').value=imported.customValues;saveDetectorSettings();renderDetectors();$('settingsStatus').textContent='Settings imported successfully.';}catch(err){$('settingsStatus').textContent=err.message||'Unable to import settings.';}finally{event.target.value='';}});
+  $('columnHeaders').value=detectorSettings.columnHeaders;$('customValues').value=detectorSettings.customValues;['columnHeaders','customValues'].forEach(id=>$(id).addEventListener('input',saveDetectorSettings));
+  $('detectorForm').addEventListener('submit',event=>{event.preventDefault();const id=$('detectorId').value,name=$('detectorName').value.trim(),pattern=$('detectorPattern').value,prefix=$('detectorPrefix').value.trim().toUpperCase();try{new RegExp(pattern,'gi');}catch(err){setTestResult(`Invalid regex: ${err.message}`,'error');return;}const duplicate=BUILTIN_DETECTORS.some(d=>d.prefix===prefix)||detectorSettings.custom.some(d=>d.prefix===prefix&&d.id!==id);if(duplicate){setTestResult('Prefix must be unique.','error');return;}if(id){const detector=detectorSettings.custom.find(d=>d.id===id);Object.assign(detector,{name,pattern,prefix});}else{const newId=`custom-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;detectorSettings.custom.push({id:newId,name,pattern,prefix,enabled:true});detectorSettings.order.push(newId);}saveDetectorSettings();renderDetectors();closeDetectorDialog();});
   renderDetectors();
   function createMasker(customInput) {
     const custom = [...new Set(customInput.split(/[\n,]+/).map(v => v.trim()).filter(Boolean))].sort((a,b) => b.length-a.length);
     const definitions = [
       { type:'CUSTOM', re: custom.length ? new RegExp(custom.map(escapeRegex).join('|'), 'g') : null, valid:()=>true, priority:0 },
-      ...BUILTIN_DETECTORS.filter(d=>!detectorSettings.disabled.includes(d.id)).map(d=>({type:d.prefix,re:new RegExp(d.pattern,'gi'),valid:d.valid,priority:d.priority})),
-      ...detectorSettings.custom.filter(d=>d.enabled).map((d,index)=>({type:d.prefix,re:new RegExp(d.pattern,'gi'),valid:()=>true,priority:10+index}))
+      ...orderedDetectors().filter(d=>d.enabled).map((d,index)=>({type:d.prefix,re:new RegExp(d.pattern,'gi'),valid:d.valid||(()=>true),priority:index+1}))
     ];
     const maps = new Map(), mappings = [], counts = {};
     function mask(text) {

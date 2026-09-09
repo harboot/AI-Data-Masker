@@ -11,23 +11,23 @@
 <main>
   <header><div class="mark" aria-hidden="true">⌾</div><h1>AI Data Master</h1><p>Local data masking for safer AI workflows</p></header>
   <div class="notice"><span aria-hidden="true">⚠</span><div><b>Protect the JSON key</b>It contains every original sensitive value. Never upload or share the key with an AI service.</div></div>
-  <section class="manager card" aria-labelledby="manager-title">
-    <div class="manager-heading">
-      <div><div class="eyebrow">Detection settings</div><h2 id="manager-title">Value Detected Manager</h2><p class="sub">Enable built-in detectors or create your own regex detectors. Settings are saved in this browser.</p></div>
-      <button class="secondary" id="addDetectorButton" type="button">+ Add detector</button>
+  <details class="manager card">
+    <summary class="manager-summary"><span><span class="eyebrow">Detection settings</span><strong id="manager-title">Value Detected Manager</strong></span><span class="summary-chevron" aria-hidden="true">⌄</span></summary>
+    <div class="manager-content" aria-labelledby="manager-title">
+      <div class="manager-heading"><p class="sub">Enable, reorder, or create detectors. Settings are saved in this browser.</p><div class="manager-actions"><button class="secondary" id="exportSettingsButton" type="button">Export</button><label class="secondary import-button" for="importSettingsFile">Import<input id="importSettingsFile" type="file" accept=".json,application/json"></label><button class="secondary" id="addDetectorButton" type="button">+ Add detector</button></div></div>
+      <div class="settings-status" id="settingsStatus" role="status" aria-live="polite"></div>
+      <div class="detector-list" id="detectorList"></div>
+      <div class="detection-inputs">
+        <div><label for="columnHeaders">Columns to mask <span class="optional">(optional)</span></label><textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">CSV/TSV header names, separated by commas or new lines.</div></div>
+        <div><label for="customValues">Custom values <span class="optional">(optional)</span></label><textarea class="compact" id="customValues" placeholder="Value one, value two" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Separate values with commas or new lines. Longer matches take priority.</div></div>
+      </div>
     </div>
-    <div class="detector-list" id="detectorList"></div>
-  </section>
+  </details>
   <div class="grid">
     <section class="card" aria-labelledby="mask-title">
       <div class="eyebrow">Step 01</div><h2 id="mask-title">Mask a file</h2><p class="sub">Sensitive values are replaced entirely in your browser.</p>
       <label for="sourceFile">Readable text file</label>
       <div class="picker"><input id="sourceFile" type="file"><div class="file-icon">TXT</div><div class="file-info"><div class="file-name" id="sourceName">Choose any file type</div><div class="file-size" id="sourceSize">Text content will be verified locally</div></div></div>
-      <label for="columnHeaders">Columns to mask <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-      <textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">Enter header names only, separated by commas or new lines. Available for CSV/TSV data with headers on the first row.</div>
-      <label for="customValues">Custom values <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-      <textarea id="customValues" placeholder="Value one, value two&#10;Another private value" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Separate values with commas or new lines. Longer matches take priority.</div>
-      <details><summary>What data can be masked?</summary><ul class="mask-options"><li>Email addresses</li><li>IPv4 and IPv6 addresses</li><li>Supported domains</li><li>Indonesian phone numbers</li><li>Philippine mobile numbers</li><li>Luhn-valid card numbers</li><li>Selected column values</li><li>Custom values</li></ul></details>
       <button class="primary" id="maskButton" disabled>Mask File</button>
       <div class="progress-wrap" id="maskProgress"><div class="progress-head"><span id="maskPhase">Processing locally</span><span id="maskPercent">0%</span></div><div class="track"><div class="bar" id="maskBar"></div></div></div>
       <div class="status" id="maskStatus" role="status" aria-live="polite">Select a file to begin.</div>

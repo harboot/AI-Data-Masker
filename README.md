@@ -8,7 +8,7 @@ during masking.
 The application is published from [`docs/`](./docs/) and has no backend,
 package manager, framework, CDN, analytics, or network dependency.
 
-## [Open the live preview](https://harboot.github.io/AI-Data-Masker/)
+## <a href="https://harboot.github.io/AI-Data-Masker/" target="_blank" rel="noopener noreferrer">Open the live preview</a>
 
 The GitHub Pages version performs the same local-only processing as a downloaded
 copy: selected files never leave your browser.
@@ -71,8 +71,9 @@ AI Data Master masks the following categories:
 - Email addresses.
 - Domains ending in `.com`, `.com.ph`, `.org`, or `.net`.
 - Indonesian phone numbers beginning with supported `08` or `62` forms.
-- Philippine mobile numbers beginning with `09` or the `63` country code,
+- Philippine phone numbers beginning with `09` or the `63` country code,
   including `+63` and `0063` international forms.
+- Indonesian NIK/KTP numbers with a valid encoded birth date.
 - Credit card numbers only when the digits pass Luhn validation.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
@@ -84,21 +85,14 @@ detector. Built-in definitions are read-only because some of them, such as
 credit-card detection, also perform validation that cannot be represented by a
 regular expression alone.
 
-You can also add custom regex detectors, edit their name, regex, and placeholder
-prefix, enable or disable them, delete them, and test a regex against a sample
-value before saving. Custom detector settings are stored only in the browser's
-local storage. The existing **Custom values** and **Columns to mask** fields
-remain independent of the manager.
+You can also reorder detectors with drag and drop; add custom regex detectors;
+edit their name, regex, and placeholder prefix; enable or disable them; delete
+them; and test a regex against a sample value before saving. **Custom values**
+and **Columns to mask** are included in the collapsed detection settings panel.
+All detection settings can be exported to JSON and imported in another browser.
 
 The interface keeps this complete list collapsed by default so it remains
 available without crowding the masking form.
-
-It deliberately does **not** detect or mask:
-
-- Indonesian NIK/KTP numbers.
-- Passwords, secrets, API keys, or authentication tokens.
-- Domains using top-level domains outside the supported list.
-- Binary or non-UTF-8 files.
 
 Custom values are escaped before regular expressions are created, and longer
 custom values are considered first. Overlapping detections are resolved before
@@ -111,6 +105,7 @@ category receives the same stable placeholder, for example:
 [EMAIL_001]
 [PHONE_001]
 [PHONE_PH_001]
+[NIK_001]
 [CARD_001]
 [CUSTOM_001]
 ```
