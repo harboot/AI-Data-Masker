@@ -30,9 +30,8 @@ copy: selected files never leave your browser.
 
 1. In **Mask a file**, select a readable UTF-8 text file. The file picker does
    not restrict extensions.
-2. For CSV or TSV data, optionally enter one or more exact column header names
-   to replace every value in those columns. Separate headers with commas or new
-   lines; only the first-row header is required, not the column's values.
+2. For CSV or TSV data, optionally add a **Column header** detector for every
+   exact header whose values should be replaced.
 3. Optionally enter custom values, separated by commas or new lines.
 4. Select **Mask File**.
 5. Review the beginning of the masked result in the full-width local preview
@@ -69,42 +68,40 @@ AI Data Masker masks the following categories:
 
 - IPv4 addresses, after validating all four octets.
 - IPv6 addresses, including compressed notation.
-- Email addresses.
-- Domains ending in `.com`, `.com.ph`, `.org`, or `.net`.
+- Email addresses (predefined JSON regex).
+- Domains ending in `.com`, `.com.ph`, `.org`, or `.net` (predefined JSON regex).
 - Indonesian phone numbers beginning with supported `08` or `62` forms.
 - Philippine Phone numbers beginning with `09` or the `63` country code,
   including `+63` and `0063` international forms.
 - Indonesian NIK/KTP numbers with a valid encoded day and month.
 - Credit card numbers only when the digits pass Luhn validation.
-- Philippine TINs in 9-digit form or the usual grouped 12-digit form.
 - Philippine SSS numbers in 10-digit or `XX-XXXXXXX-X` form.
-- PhilHealth numbers in `XX-XXXXXXXXX-X` form.
-- Pag-IBIG MID numbers in `XXXX-XXXX-XXXX` form.
-- Any remaining run of 10 or more digits. Only its first 10 digits are masked,
-  leaving subsequent digits unchanged.
+- PhilHealth numbers in plain 12-digit or `XX-XXXXXXXXX-X` form.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
 
 ### Detection settings
 
 Open **Detection settings** above the masking workflow to enable or disable each
-built-in detector. Drag detector rows to change their matching priority. The four built-in detectors—email, IP address, domain, and credit card—are
-read-only and can only be enabled or disabled. Other bundled definitions are
-loaded from `docs/predefine.json`; they can be edited or deleted like custom
-detectors.
+built-in detector. Drag detector rows to change their matching priority. Only
+the IP-address and Luhn-valid credit-card detectors live in source code; they
+are read-only and can only be enabled or disabled. Email, domain, KTP,
+Indonesian phone, PhilHealth, SSS, and Philippine phone definitions are pure
+regex entries loaded from `docs/predefine.json`, and can be edited or deleted
+like custom detectors.
 
-Detection runs sequentially in the displayed order when matches overlap. Phone
-and Luhn-valid card detectors are positioned ahead of the Philippine identifier
-detectors, while the general long-number detector is last so a more specific
-detector gets the first opportunity to mask a value. This order can still be
-customized by dragging detector rows.
+Detection runs sequentially in the displayed order when matches overlap. This
+order can be customized by dragging detector rows.
 
-Use the eye icon beside any detector to view its regex and test it against a sample
-value without changing settings. You can also add custom regex detectors, edit their
-name, description, regex, and placeholder prefix, enable or disable them, and
-delete them. Detector details also display the description. **Custom values** and **Columns to mask** are included in
-the panel. All settings are stored only in the browser's local storage and can
-be exported to JSON or imported into another browser.
+Detectors are displayed in named groups such as **General**, **Indonesia**, and
+**Philippines**. Custom detectors can use any group. Use the eye icon beside a
+regex detector to view and test its pattern without changing settings. When
+adding a detector, choose either **Regex pattern** or **Column header** matching;
+column detectors mask every non-empty value beneath an exact CSV/TSV header.
+You can edit the name, description, group, match configuration, and placeholder
+prefix. **Custom values** remains a separate literal-value setting. All settings
+are stored only in the browser's local storage and can be exported to JSON or
+imported into another browser.
 
 The interface keeps this complete list collapsed by default so it remains
 available without crowding the masking form.
@@ -118,15 +115,13 @@ category receives the same stable placeholder, for example:
 [IP_001]
 [DOMAIN_001]
 [EMAIL_001]
-[PHONE_001]
+[PHONE_ID_001]
 [PHONE_PH_001]
-[NIK_001]
+[KTP_001]
 [CARD_001]
-[TIN_PH_001]
 [SSS_PH_001]
 [PHILHEALTH_001]
-[PAGIBIG_001]
-[LONG_NUMBER_001]
+[MY_COLUMN_001]
 [CUSTOM_001]
 ```
 
