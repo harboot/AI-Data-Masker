@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>AI Data Master</title>
+  <title>AI Data Masker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <main>
-  <header><div class="mark" aria-hidden="true">⌾</div><div><h1>AI Data Master</h1><p>Local data masking for safer AI workflows</p></div></header>
+  <header><div class="mark" aria-hidden="true">⌾</div><div><h1>AI Data Masker</h1><p>Local data masking for safer AI workflows</p></div></header>
   <div class="notice"><span aria-hidden="true">⚠</span><div><b>Protect the JSON key</b>It contains every original sensitive value. Never upload or share the key with an AI service.</div></div>
   <details class="manager card" aria-labelledby="manager-title">
-    <summary class="manager-summary"><span><span class="eyebrow">Detection settings</span><strong id="manager-title">Value Detected Manager</strong></span><span class="summary-hint">Show settings</span></summary>
+    <summary class="manager-summary"><span class="eyebrow" id="manager-title">Detection settings</span><span class="summary-hint">Show settings</span></summary>
     <div class="manager-content">
-      <div class="manager-heading"><p class="sub">Enable detectors and drag them to set matching priority. Settings are saved in this browser.</p><div class="setting-actions"><button class="secondary" id="addDetectorButton" type="button">+ Add detector</button><button class="secondary" id="exportSettingsButton" type="button">Export</button><button class="secondary" id="importSettingsButton" type="button">Import</button><input id="settingsFile" type="file" accept=".json,application/json" hidden></div></div>
+      <div class="manager-heading"><p class="sub">Choose which sensitive-value detectors to use. Drag a row to set which detector wins when matches overlap; the first row has the highest priority. Settings stay in this browser.</p><div class="setting-actions"><button class="secondary" id="addDetectorButton" type="button">+ Add detector</button><button class="secondary" id="exportSettingsButton" type="button">Export</button><button class="secondary" id="importSettingsButton" type="button">Import</button><input id="settingsFile" type="file" accept=".json,application/json" hidden></div></div>
       <div class="detector-list" id="detectorList"></div>
-      <div class="setting-fields"><div><label for="columnHeaders">Columns to mask <span>(optional)</span></label><textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">CSV/TSV header names, separated by commas or new lines.</div></div><div><label for="customValues">Custom values <span>(optional)</span></label><textarea class="compact" id="customValues" placeholder="Value one, value two" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Separate values with commas or new lines. Longer matches take priority.</div></div></div>
+      <div class="setting-fields"><div><label for="columnHeaders">Columns to mask <span>(optional)</span></label><textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">Enter exact CSV or TSV header names, separated by commas or new lines. Every non-empty value beneath those headers will be masked, even when it does not match a detector.</div></div><div><label for="customValues">Custom values <span>(optional)</span></label><textarea class="compact" id="customValues" placeholder="Value one, value two" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Enter literal words or phrases to mask, separated by commas or new lines. You do not need regex syntax; when values overlap, the longer match takes priority.</div></div></div>
       <div class="import-status" id="settingsStatus" role="status" aria-live="polite"></div>
     </div>
   </details>
@@ -56,6 +56,14 @@
     <div class="hint">The prefix creates placeholders such as [EMPLOYEE_ID_001]. Letters, numbers, and underscores only.</div>
     <div class="regex-test"><label for="detectorSample">Test with sample value</label><div class="test-row"><input id="detectorSample" placeholder="EMP-123456"><button class="secondary" id="testDetectorButton" type="button">Test regex</button></div><div class="test-result" id="detectorTestResult" role="status" aria-live="polite"></div></div>
     <div class="dialog-actions"><button class="secondary" id="cancelDetectorButton" type="button">Cancel</button><button class="primary" type="submit">Save detector</button></div>
+  </form>
+</dialog>
+<dialog id="regexDetailsDialog" aria-labelledby="regexDetailsTitle">
+  <form method="dialog">
+    <div class="dialog-heading"><div><div class="eyebrow">Detector details</div><h2 id="regexDetailsTitle"></h2></div><button class="icon-button" type="submit" aria-label="Close">×</button></div>
+    <label for="regexDetailsPattern">Regex pattern</label><textarea id="regexDetailsPattern" readonly spellcheck="false"></textarea>
+    <div class="hint">This pattern is applied without case sensitivity. Some predefined detectors also validate matched values after the regex check.</div>
+    <div class="regex-test"><label for="regexDetailsSample">Test with sample value</label><div class="hint test-help">Enter an example to see whether this detector's regex finds a match. Testing does not change your settings.</div><div class="test-row"><input id="regexDetailsSample" placeholder="Enter a sample value"><button class="secondary" id="testRegexDetailsButton" type="button">Test regex</button></div><div class="test-result" id="regexDetailsTestResult" role="status" aria-live="polite"></div></div>
   </form>
 </dialog>
 <script src="app.js"></script>

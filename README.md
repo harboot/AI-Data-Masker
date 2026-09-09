@@ -1,6 +1,6 @@
-# AI Data Master
+# AI Data Masker
 
-AI Data Master is a local-only browser utility for masking sensitive values in
+AI Data Masker is a local-only browser utility for masking sensitive values in
 readable text files before those files are shared with an AI service. It can
 later restore the masked values in an AI response using the JSON key generated
 during masking.
@@ -9,8 +9,6 @@ The application is published from [`docs/`](./docs/) and has no backend,
 package manager, framework, CDN, analytics, or network dependency.
 
 ## <a href="https://harboot.github.io/AI-Data-Masker/" target="_blank" rel="noopener noreferrer">Open the live preview ↗</a>
-
-![AI Data Master interface](docs/assets/AI%20Data%20Master.png)
 
 The GitHub Pages version performs the same local-only processing as a downloaded
 copy: selected files never leave your browser.
@@ -61,12 +59,12 @@ The masked filename retains the original extension where possible:
 4. Select **Decode Response**.
 5. Download the decoded file when processing finishes.
 
-AI Data Master intentionally does not perform key-file hash validation. Confirm
+AI Data Masker intentionally does not perform key-file hash validation. Confirm
 that you selected the correct key before using or sharing the decoded output.
 
 ## Values detected
 
-AI Data Master masks the following categories:
+AI Data Masker masks the following categories:
 
 - IPv4 addresses, after validating all four octets.
 - IPv6 addresses, including compressed notation.
@@ -80,16 +78,16 @@ AI Data Master masks the following categories:
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
 
-### Value Detected Manager
+### Detection settings
 
 Open **Detection settings** above the masking workflow to enable or disable each
 built-in detector. Drag detector rows to change their matching priority. Built-in
 definitions are read-only because some of them also perform validation that
 cannot be represented by a regular expression alone.
 
-You can also add custom regex detectors, edit their name, regex, and placeholder
-prefix, enable or disable them, delete them, and test a regex against a sample
-value before saving. **Custom values** and **Columns to mask** are included in
+Use the eye icon beside any detector to view its regex and test it against a sample
+value without changing settings. You can also add custom regex detectors, edit their
+name, regex, and placeholder prefix, enable or disable them, and delete them. **Custom values** and **Columns to mask** are included in
 the panel. All settings are stored only in the browser's local storage and can
 be exported to JSON or imported into another browser.
 
