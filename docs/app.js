@@ -11,7 +11,12 @@
     { id:'phone', name:'Indonesian phone', prefix:'PHONE', pattern:'(?<!\\d)(?:(?:\\+62|0062|62)[ .-]?8|08)\\d(?:[ .-]?\\d){7,11}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return n.length>=10&&n.length<=15;}, priority:4 },
     { id:'phone-ph', name:'Philippine Phone', prefix:'PHONE_PH', pattern:'(?<!\\d)(?:(?:\\+63|0063|63)[ .-]?9|09)\\d(?:[ .-]?\\d){8}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return /^09\d{9}$/.test(n)||/^639\d{9}$/.test(n)||/^00639\d{9}$/.test(n);}, priority:4 },
     { id:'nik', name:'Indonesian NIK/KTP number', prefix:'NIK', pattern:'(?<!\\d)\\d{16}(?!\\d)', valid:value=>{const day=+value.slice(6,8),month=+value.slice(8,10);return (day>=1&&day<=31||day>=41&&day<=71)&&month>=1&&month<=12;}, priority:5 },
-    { id:'card', name:'Luhn-valid credit card', prefix:'CARD', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 }
+    { id:'card', name:'Luhn-valid credit card', prefix:'CARD', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 },
+    { id:'tin-ph', name:'Philippine TIN', prefix:'TIN_PH', pattern:'(?<!\\d)(?:\\d{3}-\\d{3}-\\d{3}(?:-\\d{3})?|\\d{9})(?!\\d)', valid:()=>true, priority:6 },
+    { id:'sss-ph', name:'Philippine SSS number', prefix:'SSS_PH', pattern:'(?<!\\d)(?:\\d{2}-\\d{7}-\\d|\\d{10})(?!\\d)', valid:()=>true, priority:7 },
+    { id:'philhealth', name:'PhilHealth number', prefix:'PHILHEALTH', pattern:'(?<!\\d)\\d{2}-\\d{9}-\\d(?!\\d)', valid:()=>true, priority:8 },
+    { id:'pagibig', name:'Pag-IBIG MID number', prefix:'PAGIBIG', pattern:'(?<!\\d)\\d{4}-\\d{4}-\\d{4}(?!\\d)', valid:()=>true, priority:9 },
+    { id:'long-number', name:'Long number (first 10 digits)', prefix:'LONG_NUMBER', pattern:'(?<!\\d)\\d{10}(?=\\d*)', valid:()=>true, priority:10 }
   ];
   const detectorSettings = loadDetectorSettings();
   const formatSize = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
