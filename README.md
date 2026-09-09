@@ -5,9 +5,13 @@ readable text files before those files are shared with an AI service. It can
 later restore the masked values in an AI response using the JSON key generated
 during masking.
 
-The complete application is contained in
-[`ai-data-master.html`](./ai-data-master.html). It has no backend, package
-manager, framework, CDN, analytics, or network dependency.
+The application is published from [`docs/`](./docs/) and has no backend,
+package manager, framework, CDN, analytics, or network dependency.
+
+## [Open the live preview](https://harboot.github.io/AI-Data-Masker/)
+
+The GitHub Pages version performs the same local-only processing as a downloaded
+copy: selected files never leave your browser.
 
 > [!WARNING]
 > The generated JSON key contains the original sensitive values. Never upload
@@ -17,7 +21,8 @@ manager, framework, CDN, analytics, or network dependency.
 ## Quick start
 
 1. Download or clone this repository.
-2. Open `ai-data-master.html` directly in a modern browser.
+2. Open `docs/index.html` directly in a modern browser, or use the live preview
+   linked above.
 3. No installation, build command, or local web server is required.
 
 ## Mask a file
@@ -71,6 +76,19 @@ AI Data Master masks the following categories:
 - Credit card numbers only when the digits pass Luhn validation.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
+
+### Value Detected Manager
+
+The manager above the masking workflow lets you enable or disable each built-in
+detector. Built-in definitions are read-only because some of them, such as
+credit-card detection, also perform validation that cannot be represented by a
+regular expression alone.
+
+You can also add custom regex detectors, edit their name, regex, and placeholder
+prefix, enable or disable them, delete them, and test a regex against a sample
+value before saving. Custom detector settings are stored only in the browser's
+local storage. The existing **Custom values** and **Columns to mask** fields
+remain independent of the manager.
 
 The interface keeps this complete list collapsed by default so it remains
 available without crowding the masking form.
@@ -155,23 +173,15 @@ object URLs, and regular-expression lookbehind.
 There is no build process. After editing the application, useful checks include:
 
 ```bash
-# Validate the embedded JavaScript syntax with Node.js.
-node - <<'NODE'
-const fs = require('fs');
-const vm = require('vm');
-const html = fs.readFileSync('ai-data-master.html', 'utf8');
-const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-new vm.Script(script);
-console.log('JavaScript syntax OK');
-NODE
+# Validate the application JavaScript syntax with Node.js.
+node --check docs/app.js
 
 # Check patch whitespace.
 git diff --check
 ```
 
-Because the app is intentionally self-contained, application changes should
-remain inside `ai-data-master.html`. Supporting project documentation may be
-maintained as Markdown files in the repository root.
+GitHub Pages serves the application from `docs/index.html`. Presentation lives
+in `docs/styles.css`, and browser behavior lives in `docs/app.js`.
 
 ## Security notes
 
