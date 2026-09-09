@@ -61,6 +61,8 @@
 <dialog id="regexDetailsDialog" aria-labelledby="regexDetailsTitle">
   <form method="dialog">
     <div class="dialog-heading"><div><div class="eyebrow">Detector details</div><h2 id="regexDetailsTitle"></h2></div><button class="icon-button" type="submit" aria-label="Close">×</button></div>
+    <label for="regexDetailsPrefix">Prefix</label><input id="regexDetailsPrefix" readonly>
+    <div class="hint">Matched values use this prefix in placeholders, followed by a sequence number.</div>
     <label for="regexDetailsPattern">Regex pattern</label><textarea id="regexDetailsPattern" readonly spellcheck="false"></textarea>
     <div class="hint">This pattern is applied without case sensitivity. Some predefined detectors also validate matched values after the regex check.</div>
     <div class="regex-test"><label for="regexDetailsSample">Test with sample value</label><div class="hint test-help">Enter an example to see whether this detector's regex finds a match. Testing does not change your settings.</div><div class="test-row"><input id="regexDetailsSample" placeholder="Enter a sample value"><button class="secondary" id="testRegexDetailsButton" type="button">Test regex</button></div><div class="test-result" id="regexDetailsTestResult" role="status" aria-live="polite"></div></div>
