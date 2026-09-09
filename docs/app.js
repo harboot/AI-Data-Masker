@@ -1,63 +1,18 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <title>AI Data Master</title>
-  <style>
-    :root{--bg:#080d13;--panel:#101923;--panel2:#0c141d;--line:#223243;--text:#e8f0f7;--muted:#8fa2b4;--cyan:#35d6c1;--blue:#4d8dff;--warn:#ffbe55;--bad:#ff6b73;--ok:#57dfa0}
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -20%,#173044 0,transparent 42%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-    main{width:min(980px,calc(100% - 32px));margin:auto;padding:56px 0 48px} header{text-align:center;margin-bottom:36px}.mark{display:inline-grid;place-items:center;width:50px;height:50px;border:1px solid #318d86;border-radius:14px;background:#102a2b;color:var(--cyan);font-size:25px;box-shadow:0 0 30px #35d6c122}h1{font-size:32px;letter-spacing:-.7px;margin:14px 0 4px}header p{margin:0;color:var(--muted)}
-    .notice{display:flex;gap:12px;align-items:flex-start;margin:0 auto 24px;padding:14px 16px;border:1px solid #6a5125;background:#211b12;border-radius:12px;color:#f6d699}.notice b{display:block;color:#ffe6ad}.notice span:first-child{font-size:20px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 15px 45px #0005}.card h2{margin:0;font-size:20px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}.sub{color:var(--muted);font-size:13px;margin:5px 0 20px}
-    label{display:block;font-size:12px;font-weight:700;margin:15px 0 7px;color:#bfd0de}.picker{position:relative;display:flex;align-items:center;gap:12px;min-height:66px;padding:12px;border:1px dashed #365069;border-radius:11px;background:#0a121a;cursor:pointer;transition:.2s}.picker:hover{border-color:var(--cyan);background:#0c191f}.picker input{position:absolute;inset:0;opacity:0;cursor:pointer}.file-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:9px;background:#17283a;color:#72a8ff;font-weight:800}.file-info{min-width:0}.file-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}.file-size{font-size:12px;color:var(--muted)}
-    textarea{display:block;width:100%;height:76px;resize:vertical;background:#091119;color:var(--text);border:1px solid #2b3e50;border-radius:9px;padding:10px 12px;font:13px/1.45 ui-monospace,SFMono-Regular,monospace;outline:none}textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35d6c119}.hint{font-size:11px;color:var(--muted);margin-top:5px}.compact{height:48px}details{margin-top:15px;border:1px solid var(--line);border-radius:9px;background:#0a121a}summary{padding:10px 12px;cursor:pointer;color:#bfd0de;font-size:12px;font-weight:700}.mask-options{margin:0;padding:0 16px 12px 31px;color:var(--muted);font-size:12px;columns:2}.preview{display:none;margin-top:18px;padding:24px;background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;box-shadow:0 15px 45px #0005}.preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.preview-head strong{font-size:16px}.preview-head span{color:var(--muted);font-size:11px}.preview-box{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:9px;background:#081018}.preview-box table{width:100%;border-collapse:collapse;font:12px/1.35 ui-monospace,SFMono-Regular,monospace}.preview-box th,.preview-box td{padding:7px 9px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}.preview-box th{position:sticky;top:0;background:#162332;color:var(--cyan)}.preview-box pre{margin:0;padding:11px;white-space:pre-wrap;word-break:break-word;color:#b9cad8;font:12px/1.45 ui-monospace,SFMono-Regular,monospace}
-    button,.download{width:100%;border:0;border-radius:10px;padding:11px 15px;font-weight:750;font-size:14px;cursor:pointer;text-decoration:none;text-align:center;transition:.2s}button.primary{margin-top:18px;color:#041410;background:linear-gradient(100deg,var(--cyan),#67e9ac)}button.primary:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}button:disabled{opacity:.38;cursor:not-allowed}.downloads{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.download{display:none;color:#c9dbeb;background:#172432;border:1px solid #2d4357}.download:hover{border-color:#5681a5}.downloads.single{grid-template-columns:1fr}
-    .progress-wrap{display:none;margin-top:17px}.progress-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}.track{height:6px;background:#1b2834;border-radius:9px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .12s}.status{min-height:22px;margin-top:13px;font-size:13px;color:var(--muted)}.status.ok{color:var(--ok)}.status.error{color:var(--bad)}footer{text-align:center;color:#657787;font-size:12px;margin-top:28px}.privacy{color:var(--cyan)}
-    @media(max-width:760px){main{padding-top:30px}.grid{grid-template-columns:1fr}.card,.preview{padding:19px}.downloads{grid-template-columns:1fr}}
-  </style>
-</head>
-<body>
-<main>
-  <header><div class="mark" aria-hidden="true">⌾</div><h1>AI Data Master</h1><p>Local data masking for safer AI workflows</p></header>
-  <div class="notice"><span aria-hidden="true">⚠</span><div><b>Protect the JSON key</b>It contains every original sensitive value. Never upload or share the key with an AI service.</div></div>
-  <div class="grid">
-    <section class="card" aria-labelledby="mask-title">
-      <div class="eyebrow">Step 01</div><h2 id="mask-title">Mask a file</h2><p class="sub">Sensitive values are replaced entirely in your browser.</p>
-      <label for="sourceFile">Readable text file</label>
-      <div class="picker"><input id="sourceFile" type="file"><div class="file-icon">TXT</div><div class="file-info"><div class="file-name" id="sourceName">Choose any file type</div><div class="file-size" id="sourceSize">Text content will be verified locally</div></div></div>
-      <label for="columnHeaders">Columns to mask <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-      <textarea class="compact" id="columnHeaders" placeholder="email, phone_number" aria-describedby="columnHint"></textarea><div class="hint" id="columnHint">Enter header names only, separated by commas or new lines. Available for CSV/TSV data with headers on the first row.</div>
-      <label for="customValues">Custom values <span style="color:var(--muted);font-weight:400">(optional)</span></label>
-      <textarea id="customValues" placeholder="Value one, value two&#10;Another private value" aria-describedby="customHint"></textarea><div class="hint" id="customHint">Separate values with commas or new lines. Longer matches take priority.</div>
-      <details><summary>What data can be masked?</summary><ul class="mask-options"><li>Email addresses</li><li>IPv4 and IPv6 addresses</li><li>Supported domains</li><li>Indonesian phone numbers</li><li>Philippine mobile numbers</li><li>Luhn-valid card numbers</li><li>Selected column values</li><li>Custom values</li></ul></details>
-      <button class="primary" id="maskButton" disabled>Mask File</button>
-      <div class="progress-wrap" id="maskProgress"><div class="progress-head"><span id="maskPhase">Processing locally</span><span id="maskPercent">0%</span></div><div class="track"><div class="bar" id="maskBar"></div></div></div>
-      <div class="status" id="maskStatus" role="status" aria-live="polite">Select a file to begin.</div>
-      <div class="downloads"><a class="download" id="maskedDownload">Download Masked File</a><a class="download" id="keyDownload">Download JSON Key</a></div>
-    </section>
-    <section class="card" aria-labelledby="decode-title">
-      <div class="eyebrow">Step 02</div><h2 id="decode-title">Decode a response</h2><p class="sub">Restore values using the matching key—also fully offline.</p>
-      <label for="responseFile">AI response file</label>
-      <div class="picker"><input id="responseFile" type="file"><div class="file-icon">AI</div><div class="file-info"><div class="file-name" id="responseName">Choose response file</div><div class="file-size" id="responseSize">Any readable text extension</div></div></div>
-      <label for="keyFile">JSON key</label>
-      <div class="picker"><input id="keyFile" type="file" accept=".json,application/json"><div class="file-icon">{ }</div><div class="file-info"><div class="file-name" id="keyName">Choose JSON key</div><div class="file-size" id="keySize">Generated during masking</div></div></div>
-      <button class="primary" id="decodeButton" disabled>Decode Response</button>
-      <div class="progress-wrap" id="decodeProgress"><div class="progress-head"><span>Decoding locally</span><span id="decodePercent">0%</span></div><div class="track"><div class="bar" id="decodeBar"></div></div></div>
-      <div class="status" id="decodeStatus" role="status" aria-live="polite">Select a response and its JSON key.</div>
-      <div class="downloads single"><a class="download" id="decodedDownload">Download Decoded File</a></div>
-    </section>
-  </div>
-  <section class="preview" id="sourcePreview" aria-labelledby="previewTitle"><div class="preview-head"><strong id="previewTitle">Masked data preview</strong><span id="previewMeta"></span></div><div class="preview-box" id="previewContent"></div></section>
-  <footer><span class="privacy">● Offline by design</span> · Files never leave this device</footer>
-</main>
-<script>
 (() => {
   'use strict';
   const CHUNK_SIZE = 4 * 1024 * 1024;
   const $ = id => document.getElementById(id);
   const state = { urls: [] };
+  const STORAGE_KEY = 'ai-data-master-detectors-v1';
+  const BUILTIN_DETECTORS = [
+    { id:'email', name:'Email address', prefix:'EMAIL', pattern:"\\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\\b", valid:()=>true, priority:1 },
+    { id:'ip', name:'IPv4 & IPv6 address', prefix:'IP', pattern:'(?<![\\w.])(?:\\d{1,3}\\.){3}\\d{1,3}(?![\\w.])|(?<![\\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\\w:])', valid:value=>value.includes(':')?validIPv6(value):validIPv4(value), priority:2 },
+    { id:'domain', name:'Supported domain', prefix:'DOMAIN', pattern:'(?<![@\\w-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(?:com\\.ph|com|org|net)\\b', valid:()=>true, priority:3 },
+    { id:'phone', name:'Indonesian phone', prefix:'PHONE', pattern:'(?<!\\d)(?:(?:\\+62|0062|62)[ .-]?8|08)\\d(?:[ .-]?\\d){7,11}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return n.length>=10&&n.length<=15;}, priority:4 },
+    { id:'phone-ph', name:'Philippine mobile', prefix:'PHONE_PH', pattern:'(?<!\\d)(?:(?:\\+63|0063|63)[ .-]?9|09)\\d(?:[ .-]?\\d){8}(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');return /^09\d{9}$/.test(n)||/^639\d{9}$/.test(n)||/^00639\d{9}$/.test(n);}, priority:4 },
+    { id:'card', name:'Luhn-valid credit card', prefix:'CARD', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 }
+  ];
+  const detectorSettings = loadDetectorSettings();
   const formatSize = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
   const escapeRegex = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const tick = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -119,16 +74,45 @@
     if (groups.some(g => !/^[0-9a-f]{1,4}$/i.test(g))) return false;
     return s.includes('::') ? groups.length < 8 - ipv4Groups : groups.length === 8 - ipv4Groups;
   }
+  function loadDetectorSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && typeof saved === 'object' && Array.isArray(saved.custom)) return { disabled:Array.isArray(saved.disabled)?saved.disabled:[], custom:saved.custom.filter(isValidCustomDetector) };
+    } catch (_) { /* Ignore unavailable storage or invalid saved settings. */ }
+    return { disabled:[], custom:[] };
+  }
+  function isValidCustomDetector(detector) {
+    if (!detector || typeof detector.id !== 'string' || typeof detector.name !== 'string' || typeof detector.pattern !== 'string' || !/^[A-Za-z][A-Za-z0-9_]*$/.test(detector.prefix || '')) return false;
+    try { new RegExp(detector.pattern, 'gi'); return true; } catch (_) { return false; }
+  }
+  function saveDetectorSettings() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(detectorSettings)); } catch (_) { /* The manager still works for this tab. */ }
+  }
+  function renderDetectors() {
+    const list=$('detectorList');list.replaceChildren();
+    const detectors=[...BUILTIN_DETECTORS.map(d=>({...d,builtin:true,enabled:!detectorSettings.disabled.includes(d.id)})),...detectorSettings.custom.map(d=>({...d,builtin:false}))];
+    detectors.forEach(detector=>{
+      const row=document.createElement('div');row.className='detector-row';
+      const toggle=document.createElement('label');toggle.className='detector-toggle';toggle.title=`${detector.enabled?'Disable':'Enable'} ${detector.name}`;
+      const input=document.createElement('input');input.type='checkbox';input.checked=detector.enabled;input.setAttribute('aria-label',`Enable ${detector.name}`);const track=document.createElement('span');track.className='toggle-track';toggle.append(input,track);
+      input.addEventListener('change',()=>{if(detector.builtin){detectorSettings.disabled=input.checked?detectorSettings.disabled.filter(id=>id!==detector.id):[...new Set([...detectorSettings.disabled,detector.id])];}else{const saved=detectorSettings.custom.find(d=>d.id===detector.id);if(saved)saved.enabled=input.checked;}saveDetectorSettings();renderDetectors();});
+      const info=document.createElement('div');info.className='detector-info';const title=document.createElement('div');title.className='detector-name';title.textContent=detector.name;const kind=document.createElement('span');kind.className='detector-kind';kind.textContent=detector.builtin?'Predefined':`Custom · ${detector.prefix}`;title.append(kind);const regex=document.createElement('div');regex.className='detector-regex';regex.textContent=detector.pattern;regex.title=detector.pattern;info.append(title,regex);row.append(toggle,info);
+      if(!detector.builtin){const actions=document.createElement('div');actions.className='detector-actions';const edit=document.createElement('button');edit.type='button';edit.className='secondary';edit.textContent='Edit';edit.addEventListener('click',()=>openDetectorDialog(detector));const remove=document.createElement('button');remove.type='button';remove.className='secondary danger';remove.textContent='Delete';remove.addEventListener('click',()=>{if(confirm(`Delete custom detector “${detector.name}”?`)){detectorSettings.custom=detectorSettings.custom.filter(d=>d.id!==detector.id);saveDetectorSettings();renderDetectors();}});actions.append(edit,remove);row.append(actions);}list.append(row);
+    });
+  }
+  function openDetectorDialog(detector=null){$('detectorDialogTitle').textContent=detector?'Edit detector':'Add detector';$('detectorId').value=detector?.id||'';$('detectorName').value=detector?.name||'';$('detectorPattern').value=detector?.pattern||'';$('detectorPrefix').value=detector?.prefix||'';$('detectorSample').value='';setTestResult('','');$('detectorDialog').showModal();}
+  function closeDetectorDialog(){$('detectorDialog').close();}
+  function setTestResult(message,kind){const result=$('detectorTestResult');result.textContent=message;result.className=`test-result ${kind}`;}
+  function testDetector(){try{const re=new RegExp($('detectorPattern').value,'gi'),sample=$('detectorSample').value,matches=sample.match(re);setTestResult(matches?.length?`Matched ${matches.length} value${matches.length===1?'':'s'}: ${matches.join(', ')}`:'No match found.',matches?.length?'ok':'error');}catch(err){setTestResult(`Invalid regex: ${err.message}`,'error');}}
+  $('addDetectorButton').addEventListener('click',()=>openDetectorDialog());$('closeDetectorDialog').addEventListener('click',closeDetectorDialog);$('cancelDetectorButton').addEventListener('click',closeDetectorDialog);$('testDetectorButton').addEventListener('click',testDetector);
+  $('detectorForm').addEventListener('submit',event=>{event.preventDefault();const id=$('detectorId').value,name=$('detectorName').value.trim(),pattern=$('detectorPattern').value,prefix=$('detectorPrefix').value.trim().toUpperCase();try{new RegExp(pattern,'gi');}catch(err){setTestResult(`Invalid regex: ${err.message}`,'error');return;}const duplicate=BUILTIN_DETECTORS.some(d=>d.prefix===prefix)||detectorSettings.custom.some(d=>d.prefix===prefix&&d.id!==id);if(duplicate){setTestResult('Prefix must be unique.','error');return;}if(id){const detector=detectorSettings.custom.find(d=>d.id===id);Object.assign(detector,{name,pattern,prefix});}else{detectorSettings.custom.push({id:`custom-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,pattern,prefix,enabled:true});}saveDetectorSettings();renderDetectors();closeDetectorDialog();});
+  renderDetectors();
   function createMasker(customInput) {
     const custom = [...new Set(customInput.split(/[\n,]+/).map(v => v.trim()).filter(Boolean))].sort((a,b) => b.length-a.length);
     const definitions = [
       { type:'CUSTOM', re: custom.length ? new RegExp(custom.map(escapeRegex).join('|'), 'g') : null, valid:()=>true, priority:0 },
-      { type:'EMAIL', re:/\b[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?)+\b/gi, valid:()=>true, priority:1 },
-      { type:'IP', re:/(?<![\w.])(?:\d{1,3}\.){3}\d{1,3}(?![\w.])|(?<![\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\w:])/gi, valid:v=>v.includes(':')?validIPv6(v):validIPv4(v), priority:2 },
-      { type:'DOMAIN', re:/(?<![@\w-])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com\.ph|com|org|net)\b/gi, valid:()=>true, priority:3 },
-      { type:'PHONE', re:/(?<!\d)(?:(?:\+62|0062|62)[ .-]?8|08)\d(?:[ .-]?\d){7,11}(?!\d)/g, valid:v=>{const n=v.replace(/\D/g,''); return n.length>=10&&n.length<=15;}, priority:4 },
-      { type:'PHONE_PH', re:/(?<!\d)(?:(?:\+63|0063|63)[ .-]?9|09)\d(?:[ .-]?\d){8}(?!\d)/g, valid:v=>{const n=v.replace(/\D/g,'');return /^09\d{9}$/.test(n)||/^639\d{9}$/.test(n)||/^00639\d{9}$/.test(n);}, priority:4 },
-      { type:'CARD', re:/(?<!\d)(?:\d[ -]?){12,18}\d(?!\d)/g, valid:v=>{const n=v.replace(/\D/g,''); if(n.length<13||n.length>19)return false; let sum=0,alt=false; for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;}, priority:5 }
+      ...BUILTIN_DETECTORS.filter(d=>!detectorSettings.disabled.includes(d.id)).map(d=>({type:d.prefix,re:new RegExp(d.pattern,'gi'),valid:d.valid,priority:d.priority})),
+      ...detectorSettings.custom.filter(d=>d.enabled).map((d,index)=>({type:d.prefix,re:new RegExp(d.pattern,'gi'),valid:()=>true,priority:10+index}))
     ];
     const maps = new Map(), mappings = [], counts = {};
     function mask(text) {
@@ -172,6 +156,3 @@
   });
   window.addEventListener('beforeunload',()=>state.urls.forEach(URL.revokeObjectURL));
 })();
-</script>
-</body>
-</html>
