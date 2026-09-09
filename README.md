@@ -1,5 +1,7 @@
 # AI Data Master
 
+![AI Data Master header](assets/AI%20Data%20Master.png)
+
 AI Data Master is a local-only browser utility for masking sensitive values in
 readable text files before those files are shared with an AI service. It can
 later restore the masked values in an AI response using the JSON key generated
@@ -8,7 +10,7 @@ during masking.
 The application is published from [`docs/`](./docs/) and has no backend,
 package manager, framework, CDN, analytics, or network dependency.
 
-## [Open the live preview](https://harboot.github.io/AI-Data-Masker/)
+## <a href="https://harboot.github.io/AI-Data-Masker/" target="_blank" rel="noopener noreferrer">Open the live preview ↗</a>
 
 The GitHub Pages version performs the same local-only processing as a downloaded
 copy: selected files never leave your browser.
@@ -71,8 +73,9 @@ AI Data Master masks the following categories:
 - Email addresses.
 - Domains ending in `.com`, `.com.ph`, `.org`, or `.net`.
 - Indonesian phone numbers beginning with supported `08` or `62` forms.
-- Philippine mobile numbers beginning with `09` or the `63` country code,
+- Philippine Phone numbers beginning with `09` or the `63` country code,
   including `+63` and `0063` international forms.
+- Indonesian NIK/KTP numbers consisting of 16 digits.
 - Credit card numbers only when the digits pass Luhn validation.
 - User-provided custom values.
 - Every value under user-selected CSV or TSV column headers.
@@ -86,19 +89,10 @@ regular expression alone.
 
 You can also add custom regex detectors, edit their name, regex, and placeholder
 prefix, enable or disable them, delete them, and test a regex against a sample
-value before saving. Custom detector settings are stored only in the browser's
-local storage. The existing **Custom values** and **Columns to mask** fields
-remain independent of the manager.
-
-The interface keeps this complete list collapsed by default so it remains
-available without crowding the masking form.
-
-It deliberately does **not** detect or mask:
-
-- Indonesian NIK/KTP numbers.
-- Passwords, secrets, API keys, or authentication tokens.
-- Domains using top-level domains outside the supported list.
-- Binary or non-UTF-8 files.
+value before saving. Detector settings, ordering, custom values, and selected columns are stored only
+in the browser's local storage. They can also be exported to a JSON settings file
+and imported in another browser. The settings panel is collapsed by default so
+it remains available without crowding the masking workflow.
 
 Custom values are escaped before regular expressions are created, and longer
 custom values are considered first. Overlapping detections are resolved before
@@ -111,6 +105,7 @@ category receives the same stable placeholder, for example:
 [EMAIL_001]
 [PHONE_001]
 [PHONE_PH_001]
+[NIK_001]
 [CARD_001]
 [CUSTOM_001]
 ```
