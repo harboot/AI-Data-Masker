@@ -5,8 +5,8 @@
   const state = { urls: [] };
   const STORAGE_KEY = 'ai-data-master-detectors-v1';
   const BUILTIN_DETECTORS = [
-    { id:'ip', name:'IPv4 & IPv6 address', group:'General', description:'Valid IPv4 and IPv6 network addresses.', prefix:'IP', kind:'regex', pattern:'(?<![\\w.])(?:\\d{1,3}\\.){3}\\d{1,3}(?![\\w.])|(?<![\\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\\w:])', valid:value=>value.includes(':')?validIPv6(value):validIPv4(value) },
-    { id:'card', name:'Luhn-valid credit card', group:'General', description:'Credit card numbers containing 13–19 digits that pass Luhn validation.', prefix:'CARD', kind:'regex', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;} }
+    { id:'ip', name:'IPv4 & IPv6', group:'General', description:'Valid IPv4 and IPv6 network addresses.', prefix:'IP', kind:'regex', pattern:'(?<![\\w.])(?:\\d{1,3}\\.){3}\\d{1,3}(?![\\w.])|(?<![\\w:])(?:[0-9a-f]{0,4}:){2,7}[0-9a-f:.]{0,15}(?![\\w:])', valid:value=>value.includes(':')?validIPv6(value):validIPv4(value) },
+    { id:'card', name:'Credit Card (Luhn)', group:'General', description:'Credit card numbers containing 13–19 digits that pass Luhn validation.', prefix:'CARD', kind:'regex', pattern:'(?<!\\d)(?:\\d[ -]?){12,18}\\d(?!\\d)', valid:value=>{const n=value.replace(/\D/g,'');if(n.length<13||n.length>19)return false;let sum=0,alt=false;for(let i=n.length-1;i>=0;i--){let d=+n[i];if(alt&&(d*=2)>9)d-=9;sum+=d;alt=!alt;}return sum%10===0;} }
   ];
   let detectorSettings = loadDetectorSettings();
   const formatSize = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
@@ -92,12 +92,14 @@
     const list=$('detectorList');list.replaceChildren();
     const available=[...BUILTIN_DETECTORS.map(d=>({...d,builtin:true,enabled:!detectorSettings.disabled.includes(d.id)})),...detectorSettings.custom.map(d=>({...d,builtin:false,enabled:d.enabled!==false}))];
     const positions=new Map(detectorSettings.order.map((id,index)=>[id,index]));
-    const detectors=available.sort((a,b)=>(positions.get(a.id)??1e6)-(positions.get(b.id)??1e6));
+    const groupOrder=['General','Indonesia','Philippines','Columns','Custom'];
+    const groupRank=group=>{const index=groupOrder.indexOf(group);return index<0?groupOrder.length:index;};
+    const detectors=available.sort((a,b)=>{const aGroup=a.group?.trim()||'Custom',bGroup=b.group?.trim()||'Custom';return groupRank(aGroup)-groupRank(bGroup)||(groupRank(aGroup)===groupOrder.length?aGroup.localeCompare(bGroup):0)||(positions.get(a.id)??1e6)-(positions.get(b.id)??1e6);});
     detectorSettings.order=detectors.map(d=>d.id);
     let renderedGroup='';
     detectors.forEach(detector=>{
       const group=detector.group?.trim()||'Custom';if(group!==renderedGroup){const heading=document.createElement('div');heading.className='detector-group';heading.textContent=group;list.append(heading);renderedGroup=group;}
-      const row=document.createElement('div');row.className='detector-row';row.draggable=true;row.dataset.id=detector.id;
+      const row=document.createElement('div');row.className='detector-row';row.draggable=true;row.dataset.id=detector.id;row.dataset.group=group;
       const handle=document.createElement('span');handle.className='drag-handle';handle.textContent='⠿';handle.title='Drag to reorder';
       const toggle=document.createElement('label');toggle.className='detector-toggle';toggle.title=`${detector.enabled?'Disable':'Enable'} ${detector.name}`;
       const input=document.createElement('input');input.type='checkbox';input.checked=detector.enabled;input.setAttribute('aria-label',`Enable ${detector.name}`);const track=document.createElement('span');track.className='toggle-track';toggle.append(input,track);
@@ -108,7 +110,7 @@
       row.addEventListener('dragstart',()=>row.classList.add('dragging'));row.addEventListener('dragend',()=>{row.classList.remove('dragging');detectorSettings.order=[...list.querySelectorAll('.detector-row')].map(item=>item.dataset.id);saveDetectorSettings();renderDetectors();});
     });
   }
-  $('detectorList').addEventListener('dragover',event=>{event.preventDefault();const list=$('detectorList'),dragged=list.querySelector('.dragging');if(!dragged)return;const after=[...list.querySelectorAll('.detector-row:not(.dragging)')].find(row=>event.clientY<row.getBoundingClientRect().top+row.offsetHeight/2);list.insertBefore(dragged,after||null);});
+  $('detectorList').addEventListener('dragover',event=>{event.preventDefault();const list=$('detectorList'),dragged=list.querySelector('.dragging');if(!dragged)return;const peers=[...list.querySelectorAll('.detector-row:not(.dragging)')].filter(row=>row.dataset.group===dragged.dataset.group),after=peers.find(row=>event.clientY<row.getBoundingClientRect().top+row.offsetHeight/2);if(after)list.insertBefore(dragged,after);else if(peers.length)list.insertBefore(dragged,peers.at(-1).nextSibling);});
   function updateDetectorType(){const header=$('detectorType').value==='header';$('detectorPatternFields').hidden=header;$('detectorHeaderFields').hidden=!header;$('detectorRegexTest').hidden=header;}
   function openDetectorDialog(detector=null){$('detectorDialogTitle').textContent=detector?'Edit detector':'Add detector';$('detectorId').value=detector?.id||'';$('detectorName').value=detector?.name||'';$('detectorDescription').value=detector?.description||'';$('detectorGroup').value=detector?.group||'Custom';$('detectorType').value=detector?.kind||'regex';$('detectorPattern').value=detector?.pattern||'';$('detectorHeader').value=detector?.header||'';$('detectorPrefix').value=detector?.prefix||'';$('detectorSample').value='';updateDetectorType();setTestResult('','');$('detectorDialog').showModal();}
   function closeDetectorDialog(){$('detectorDialog').close();}
