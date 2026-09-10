@@ -1,3 +1,5 @@
+![AI Data Masker](docs/assets/AI-Data-Masker.png)
+
 # AI Data Masker
 
 AI Data Masker is a local-only browser utility for masking sensitive values in
